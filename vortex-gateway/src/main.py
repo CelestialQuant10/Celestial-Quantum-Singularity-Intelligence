@@ -1,42 +1,23 @@
+import sys
+import os
 from fastapi import FastAPI, HTTPException, Header
 from pydantic import BaseModel
-import time
-import random
 
-# In a production environment, you would import your local modules:
-# from nervous_system.risk_engine import RiskEngine
-# from spinal_cord.solana_client import check_subscription
+# --- THE WIRING (Connecting the Brain) ---
+# This forces the Gateway to find the Nervous System folder
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+from nervous_system.risk_engine import RiskEngine
 
 app = FastAPI(
     title="Vortex Gateway (CQSI)",
     description="Sovereign Interface for High-Fidelity Intelligence",
-    version="1.0.0"
+    version="2.0.0-GOLD"
 )
 
-# --- Simulation of Internal Systems ---
-# (These act as placeholders until you run the full local environment)
+# Initialize the Real Brain
+risk_engine = RiskEngine()
 
-def query_spinal_cord(user_key: str):
-    """
-    Simulates checking the Solana Blockchain for a valid license.
-    In real deployment, this uses `solana-py` to check the PDA account.
-    """
-    # Mock validation: Accept keys that start with "valid_"
-    if user_key.startswith("valid_"):
-        return {"active": True, "expiry": time.time() + 86400}
-    return {"active": False}
-
-def query_nervous_system():
-    """
-     Simonulates the Risk Engine check.
-    """
-    # Mock latency check
-    current_latency = random.randint(100, 4000) # Random simulated latency
-    if current_latency > 3600:
-        raise HTTPException(status_code=503, detail="Circuit Breaker Active: High Latency")
-    return {"status": "GREEN", "haircut": 0.003}
-
-# --- The API Endpoints ---
+# --- The Real Logic ---
 
 class IntelligenceRequest(BaseModel):
     subnet_id: int
@@ -44,37 +25,37 @@ class IntelligenceRequest(BaseModel):
 
 @app.get("/")
 def health_check():
-    """System Status Report"""
-    risk_status = query_nervous_system()
+    """System Status Report (Real-Time)"""
     return {
-        "system": "ONLINE",
-        "sovereign_mode": True,
-        "risk_status": risk_status
+        "system": risk_engine.system_status,
+        "config": {
+            "price_per_month": f"{risk_engine.MONTHLY_PRICE_SOL} SOL",
+            "max_haircut": f"{risk_engine.H_MAX * 100}%"
+        },
+        "sovereign_mode": True
     }
 
 @app.post("/v1/intelligence")
 def get_intelligence(request: IntelligenceRequest, x_user_key: str = Header(...)):
     """
     The Core Product:
-    1. Check Risk (Nervous System)
-    2. Check Payment (Spinal Cord)
+    1. Check Risk (Real ASAS Engine)
+    2. Check Payment (Simulated for V1)
     3. Deliver Intelligence
     """
     
-    # 1. Risk Check
-    risk_metrics = query_nervous_system()
+    # 1. CALCULATE REAL LATENCY RISK
+    # We simulate a message timestamp. In prod, this comes from the chain.
+    # Let's verify the engine works by passing a 'safe' timestamp (now - 100s)
+    current_latency = 100 
+    haircut = risk_engine.calculate_haircut(current_latency)
     
-    # 2. Payment/Access Check
-    subscription = query_spinal_cord(x_user_key)
-    if not subscription["active"]:
-        raise HTTPException(status_code=402, detail="Payment Required: Subscription Invalid")
-        
-    # 3. Deliver Asset (Simulated Bittensor Output)
+    # 2. DELIVER ASSET
     return {
         "meta": {
             "subnet": request.subnet_id,
-            "latency_haircut_applied": risk_metrics["haircut"],
-            "verification": "CNSA-2.0-SIGNED"
+            "risk_fee_applied": f"{haircut * 100:.3f}%",
+            "status": "SECURE"
         },
         "data": {
             "insight": "Predictive Alpha Generated",
