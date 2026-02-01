@@ -1,96 +1,90 @@
 import time
-import random
-import os
-import sys
 import math
+import random
+import sys
+import os
 
-# --- TERMINAL MAGIC (Technique #14: Format Breaking) ---
+# --- TERMINAL QUANTUM VISUALIZER ---
 class Console:
-    RESET = "\033[0m"
-    BOLD = "\033[1m"
-    CYAN = "\033[96m"
-    GREEN = "\033[92m"
-    RED = "\033[91m"
-    YELLOW = "\033[93m"
-    PURPLE = "\033[95m"
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m'
+    DARKCYAN = '\033[36m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    END = '\033[0m'
 
     @staticmethod
     def clear():
         os.system('cls' if os.name == 'nt' else 'clear')
 
-# --- THE SIMULATION ENGINE ---
-def calculate_vortex_geometry(tick):
-    # Simulating the Golden Ratio Vortex
-    angle = tick * 0.1
-    volatility = abs(math.sin(tick * 0.05))
-    # The "Singularity" metric
-    entropy = (math.cos(angle) * math.sin(angle * 1.618)) + 0.5
-    return volatility, entropy
+def draw_vortex(entropy):
+    """Generates a text-based vortex representation based on entropy."""
+    chars = " .:-=+*#%@"
+    size = int(entropy * 10)
+    if size >= len(chars): size = len(chars) - 1
+    return chars[size] * 10
 
-def draw_hud(tick, volatility, entropy, spinal_status):
-    Console.clear()
-    
-    # 1. HEADER
-    print(f"{Console.PURPLE}{Console.BOLD}")
-    print(f"╔════════════════════════════════════════════════════════════╗")
-    print(f"║   CELESTIAL QUANTUM SINGULARITY  //  SYSTEM MONITOR v1.0   ║")
-    print(f"╚════════════════════════════════════════════════════════════╝{Console.RESET}")
-    print("")
-
-    # 2. NERVOUS SYSTEM (Sensors)
-    print(f"{Console.CYAN}[ NERVOUS SYSTEM ]{Console.RESET}")
-    print(f"  > Market Source:   SOL_MAINNET_BETA")
-    bar_len = int(volatility * 20)
-    bar = "█" * bar_len + "░" * (20 - bar_len)
-    print(f"  > Volatility:      [{bar}] {volatility:.4f}")
-    
-    # 3. CELESTIAL CORE (Brain)
-    print(f"\n{Console.YELLOW}[ CELESTIAL CORE ]{Console.RESET}")
-    print(f"  > Vortex Entropy:  {entropy:.4f}")
-    if entropy > 0.8:
-        decision = f"{Console.GREEN}ACCUMULATE{Console.RESET}"
-    elif entropy < 0.2:
-        decision = f"{Console.RED}DISSIPATE{Console.RESET}"
-    else:
-        decision = "OBSERVE"
-    print(f"  > Strategy:        {decision}")
-
-    # 4. SPINAL CORD (On-Chain Execution)
-    print(f"\n{Console.RED}[ SPINAL CORD (RUST) ]{Console.RESET}")
-    print(f"  > Status:          {spinal_status}")
-    print(f"  > Program ID:      Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS")
-    
-    # 5. DREAM STATE (Prediction)
-    prediction = "STABLE" if volatility < 0.5 else "CRITICAL"
-    print(f"\n{Console.PURPLE}[ DREAM STATE PREDICTION ]{Console.RESET}")
-    print(f"  > T+10s Forecast:  {prediction}")
-
-# --- THE HYBRID LOOP ---
-def run_monitor():
+def dashboard_loop():
     tick = 0
-    spinal_state = "IDLE"
+    sol_price = 145.00
     
     while True:
-        try:
-            # Physics Calculation
-            vol, ent = calculate_vortex_geometry(tick)
+        Console.clear()
+        
+        # 1. GENERATE DATA (Simulating 'nervous-system' input)
+        volatility = abs(math.sin(tick * 0.1))
+        latency = random.randint(10, 150)
+        vortex_entropy = (math.cos(tick * 0.05) * math.sin(tick * 0.1)) + 0.5
+        
+        # 2. DECISION LOGIC (Simulating 'celestial_core')
+        status = "OBSERVING"
+        color = Console.BLUE
+        
+        if vortex_entropy > 0.8:
+            status = "⚡ EXECUTE REFLEX"
+            color = Console.GREEN
+            # This is where we would trigger the 'spinal-cord' Rust program
             
-            # Simulated Spine Trigger
-            if ent > 0.8 and vol < 0.7:
-                spinal_state = f"{Console.GREEN}EXECUTING TX (Block {245000+tick}){Console.RESET}"
-            elif vol > 0.9:
-                 spinal_state = f"{Console.RED}REFLEX BLOCK (High Risk){Console.RESET}"
-            else:
-                spinal_state = "AWAITING SIGNAL..."
+        elif latency > 120:
+            status = "🛡️ DEFENSE BLOCK"
+            color = Console.RED
 
-            draw_hud(tick, vol, ent, spinal_state)
-            
-            tick += 1
-            time.sleep(0.2)
-            
-        except KeyboardInterrupt:
-            print("\n🌌 SYSTEM SHUTDOWN.")
-            sys.exit()
+        # 3. RENDER THE GLASS COCKPIT
+        print(f"{Console.PURPLE}╔════════════════════════════════════════════════════╗{Console.END}")
+        print(f"{Console.PURPLE}║   CELESTIAL QUANTUM SINGULARITY // SYSTEM HUD      ║{Console.END}")
+        print(f"{Console.PURPLE}╚════════════════════════════════════════════════════╝{Console.END}")
+        print("")
+        
+        # SENSORY MODULE
+        print(f"{Console.CYAN}[ NERVOUS SYSTEM ]{Console.END}")
+        print(f"  > LATENCY:      {latency}ms")
+        print(f"  > VOLATILITY:   {volatility:.4f} φ")
+        
+        # CORE MODULE
+        print(f"\n{Console.YELLOW}[ CELESTIAL CORE ]{Console.END}")
+        print(f"  > ENTROPY:      [{draw_vortex(vortex_entropy)}] {vortex_entropy:.4f}")
+        print(f"  > STRATEGY:     {color}{status}{Console.END}")
+
+        # SPINAL MODULE (Blockchain)
+        print(f"\n{Console.RED}[ SPINAL CORD (SOLANA) ]{Console.END}")
+        if status == "⚡ EXECUTE REFLEX":
+            print(f"  > TX SIGNATURE: {Console.GREEN}Confirmed (Block {245910 + tick}){Console.END}")
+            print(f"  > GAS COST:     0.000005 SOL")
+        else:
+            print(f"  > STATUS:       IDLE")
+
+        print(f"\n{Console.DARKCYAN}------------------------------------------------------{Console.END}")
+        print(f"SYSTEM TIME: {time.time()}")
+        
+        tick += 1
+        time.sleep(0.2)
 
 if __name__ == "__main__":
-    run_monitor()
+    try:
+        dashboard_loop()
+    except KeyboardInterrupt:
+        print("\n🌑 SINGULARITY HIBERNATING.")
